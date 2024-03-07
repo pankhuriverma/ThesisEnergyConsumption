@@ -1,0 +1,14 @@
+Cycles vs DRAM Energy
+MSE Test Loss: 0.0208157729357481
+Huber Test Loss: 0.010405920445919037
+
+IPC vs CPU Energy
+MSE Test Loss: 0.01587483286857605
+Huber Test Loss: 0.007927232421934605
+
+IPC, Cycles vs CPU, DRAM Energy
+Huber Train Loss: 0.0020
+Huber Test Loss: 0.0019324686145409942
+
+MSE Train Loss: 0.0040
+MSE Test Loss: 0.0038565669674426317

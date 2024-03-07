@@ -7,4 +7,15 @@
     <orderEntry type="jdk" jdkName="Python 3.10 virtualenv at ~/thesis/env_thesis/venv (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/tools" />
+        <option value="$MODULE_DIR$/results" />
+        <option value="$MODULE_DIR$/other_files" />
+        <option value="$MODULE_DIR$/models" />
+        <option value="$MODULE_DIR$/dataset" />
+      </list>
+    </option>
+  </component>
 </module>

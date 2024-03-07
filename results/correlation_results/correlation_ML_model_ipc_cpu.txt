@@ -1,0 +1,1 @@
+{'ipc and cpu energy': {'rho': -0.7709651959912323, 'p_value': 0.0}}
