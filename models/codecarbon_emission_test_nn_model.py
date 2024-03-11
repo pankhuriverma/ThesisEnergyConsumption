@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 from codecarbon import EmissionsTracker
+import numpy as np
 
 mnist = tf.keras.datasets.mnist
 
