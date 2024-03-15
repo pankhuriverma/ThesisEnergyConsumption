@@ -116,6 +116,36 @@ def plot_3d_graph(X_test_unscaled, y_test_unscaled, y_pred_unscaled):
     plt.show()
 
 
+from sklearn.model_selection import train_test_split
+
+
+def train_val_test_split(X, y, test_size=0.2, val_size=0.25, random_state=None):
+    """
+    Splits the dataset into training, validation, and test sets.
+
+    Parameters:
+    - X: Features dataset.
+    - y: Target dataset.
+    - test_size: Proportion of the dataset to include in the test split.
+    - val_size: Proportion of the training dataset to include in the validation split.
+    - random_state: Controls the shuffling applied to the data before applying the split.
+
+    Returns:
+    - X_train, X_val, X_test, y_train, y_val, y_test: Split datasets.
+    """
+    # First, split into training and test set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    # Adjust val_size to account for the reduced size of the training set after the initial split
+    val_size_adjusted = val_size / (1 - test_size)
+
+    # Then, split the training set into training and validation sets
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size_adjusted,
+                                                      random_state=random_state)
+
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
 csv_file_path = '../dataset/ipc_cycles_dataset/ML_model_ipc_cycles_dataset_10 iterations_avg.csv'
 data = pd.read_csv(csv_file_path)
 print(data)
@@ -138,7 +168,9 @@ X = data[['ipc']]  # Independent variable
 y = data[['cpu energy']]  # Dependent variable"""
 
 # Splitting the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X.values, y.values, test_size=0.2, random_state=42)
+#X_train, X_test, y_train, y_test = train_test_split(X.values, y.values, test_size=0.2, random_state=42)
+X_train, X_val, X_test, y_train, y_val, y_test = train_val_test_split(X, y, test_size=0.2, val_size=0.25, random_state=42)
+print(X_train.shape, X_val.shape, X_test.shape, y_train.shape, y_val.shape, y_test.shape )
 print("!!! X train")
 print(X_train)
 print("!!! y train")
@@ -146,8 +178,10 @@ print(y_train)
 # Normalizing the data
 scaler = MinMaxScaler()
 X_train_scaled = scaler.fit_transform(X_train)
+X_val_scaled = scaler.fit_transform(X_val)
 X_test_scaled = scaler.transform(X_test)
 y_train_scaled = scaler.fit_transform(y_train)
+y_val_scaled = scaler.fit_transform(y_val)
 y_test_scaled = scaler.transform(y_test)
 print("!!! X train scaled")
 print((X_train_scaled))
@@ -165,7 +199,9 @@ model = Sequential([
 ])
 
 model.compile(optimizer=Adam(learning_rate=0.0001), loss='huber')
-history = model.fit(X_train_scaled, y_train_scaled, validation_split=0.2, epochs=200, batch_size=64, verbose=1)
+history = model.fit(X_train_scaled, y_train_scaled, epochs=200, batch_size=64, verbose=1, validation_data=(X_val_scaled, y_val_scaled))
+
+#history = model.fit(X_train_scaled, y_train_scaled, validation_split=0.2, epochs=200, batch_size=64, verbose=1)
 
 
 
@@ -179,10 +215,12 @@ print("layer2")
 print(layer2_weights)
 
 
-
-
-test_loss = model.evaluate(X_test_scaled, y_test_scaled, verbose=1)
+test_loss = model.evaluate(X_test_scaled, y_test_scaled)
 print(f"Test Loss: {test_loss}")
+
+
+#test_loss = model.evaluate(X_test_scaled, y_test_scaled, verbose=1)
+#print(f"Test Loss: {test_loss}")
 
 y_pred = model.predict(X_test_scaled)
 

@@ -12,3 +12,10 @@ Huber Test Loss: 0.0019324686145409942
 
 MSE Train Loss: 0.0040
 MSE Test Loss: 0.0038565669674426317
+
+
+
+Final Results
+Huber Train Loss: 0.0020
+Huber Val Loss: 0.0023
+Huber Test Loss: 0.0021620886400341988
