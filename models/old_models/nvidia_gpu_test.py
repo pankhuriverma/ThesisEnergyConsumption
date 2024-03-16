@@ -36,7 +36,7 @@ def main():
 
 if __name__ == "__main__":
     main()"""
-"""
+
 
 import pycuda.autoinit
 import pycuda.gpuarray as gpuarray
@@ -110,10 +110,6 @@ def print_gpu_info():
 
 print_gpu_info()"""
 
-import tensorflow as tf
-
-from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
 
 
 
