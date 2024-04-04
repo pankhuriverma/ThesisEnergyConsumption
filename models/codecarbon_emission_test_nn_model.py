@@ -1,7 +1,9 @@
 import tensorflow as tf
-
+import os
 from codecarbon import EmissionsTracker
-import numpy as np
+from codecarbon import track_emissions
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 mnist = tf.keras.datasets.mnist
 
@@ -22,7 +24,7 @@ loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
 model.compile(optimizer="adam", loss=loss_fn, metrics=["accuracy"])
 
-tracker = EmissionsTracker()
+tracker = EmissionsTracker(gpu_ids= "")
 tracker.start()
 model.fit(x_train, y_train, epochs=10)
 emissions: float = tracker.stop()

@@ -15,15 +15,15 @@ import dataset
 
 
 # Creating a DataFrame from the CSV data
-data = pd.read_csv("../dataset/ipc_cycles_dataset/ML_model_ipc_cycles_dataset_10 iterations_avg.csv")
+data = pd.read_csv("../dataset/ipc_cycles_dataset/ML_model_svm_ipc_cycles_dataset_10_iterations_avg.csv")
 
 
 #For CPU Model
 # Independent variables
-X = data['cycles']
+X = data['ipc']
 
 # Dependent variables
-Y = data['dram energy']
+Y = data['cpu energy']
 
 
 """#For DRAM Model
