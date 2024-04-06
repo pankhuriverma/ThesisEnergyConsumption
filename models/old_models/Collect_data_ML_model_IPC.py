@@ -95,6 +95,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../dataset/ipc_dataset/old_dataset/ML_model_linear_test_ipc_10iterations_avg.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/ipc_dataset/old_dataset/ML_model_linear_test_ipc_10iterations_avg.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'w')
 

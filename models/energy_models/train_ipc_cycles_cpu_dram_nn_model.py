@@ -6,6 +6,24 @@ import pandas as pd
 import numpy as np
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+
+
+
+def calculate_co2(y_pred_list,y_test_list):
+    germany_co2_intensity = 365.477
+    pred_co2_list = []
+    test_co2_list = []
+    for pred,test in zip(y_pred_list, y_test_list):
+        pred_co2 = (pred/3600000) * germany_co2_intensity
+        pred_co2_list.append(pred_co2)
+        test_co2 = (test/3600000) * germany_co2_intensity
+        test_co2_list.append(test_co2)
+
+    return pred_co2_list, test_co2_list
+
 
 
 def clean_data(data, feature, target):
@@ -147,7 +165,7 @@ def train_val_test_split(X, y, test_size=0.2, val_size=0.25, random_state=None):
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-csv_file_path = '../dataset/ipc_cycles_dataset/ML_model_linear_ipc_cycles_dataset_10_iterations_avg.csv'
+csv_file_path = '../../dataset/ipc_cycles_dataset/ML_model_linear_ipc_cycles_dataset_10_iterations_avg.csv'
 data = pd.read_csv(csv_file_path)
 print(data)
 clean_data_stage1 = clean_data(data,'ipc','cpu energy')
@@ -268,3 +286,8 @@ to_csvfile["true"] = y_test_list
 """df = pd.DataFrame(to_csvfile)
 csv_file = '../dataset/ipc_dataset/NN_model_ipc_cpu_cyles_dram_pred_test_huber_loss_compare.csv' # Specify your CSV file name
 df.to_csv(csv_file, index=False, mode = 'w')"""
+
+y_pred_co2emm, y_test_co2emm = calculate_co2(y_pred_list, y_test_list)
+
+print(y_pred_co2emm)
+print(y_test_co2emm)

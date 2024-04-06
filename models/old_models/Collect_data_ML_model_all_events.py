@@ -146,6 +146,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../dataset/old_datasets/ML_model_collected_dataset_ins_cyc_row.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/old_datasets/ML_model_collected_dataset_ins_cyc_row.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'a')
 

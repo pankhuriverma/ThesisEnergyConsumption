@@ -104,7 +104,7 @@ def plot_2d_graph(X,Y):
     plt.legend()
     plt.show()
 
-csv_file_path = '../dataset/cycles_dataset/ML_model_collected_dataset_cycles_10iterations_avg.csv'
+csv_file_path = '../../dataset/cycles_dataset/ML_model_collected_dataset_cycles_10iterations_avg.csv'
 data = pd.read_csv(csv_file_path)
 
 X, y = clean_data(data)
@@ -175,5 +175,5 @@ to_csvfile["pred"] = y_pred_list
 to_csvfile["true"] = y_test_list
 
 df = pd.DataFrame(to_csvfile)
-csv_file = '../dataset/cycles_dataset/NN_model_cycles_dram_pred_test_huber_loss_compare.csv'  # Specify your CSV file name
+csv_file = '../../dataset/cycles_dataset/NN_model_cycles_dram_pred_test_huber_loss_compare.csv'  # Specify your CSV file name
 df.to_csv(csv_file, index=False, mode = 'w')
