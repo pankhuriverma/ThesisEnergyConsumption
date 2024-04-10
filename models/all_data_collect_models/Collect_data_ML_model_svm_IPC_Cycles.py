@@ -26,11 +26,11 @@ def measure_model_perf_energy(X_train, y_train):
         svm_classifier = SVC(kernel='linear', random_state=42)
         svm_classifier.fit(X_train, y_train)
         counters = papi_high.stop_counters()
+        meter.end()
+
         ins = counters[0]
         cycle = counters[1]
         ipc = ins / cycle if cycle > 0 else 0
-
-        meter.end()
 
         output = meter.result
         cpu_ener = output.pkg[0] / 1000000 # Assuming single-socket CPU; adjust as necessary
@@ -113,6 +113,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_svm_ipc_cycles_dataset_10_iterations_avg.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_svm_dataset.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'w')
 

@@ -26,11 +26,11 @@ def measure_model_perf_energy(X_train, y_train):
         decision_tree = DecisionTreeClassifier(random_state=42)
         decision_tree.fit(X_train, y_train)
         counters = papi_high.stop_counters()
+        meter.end()
+
         ins = counters[0]
         cycle = counters[1]
         ipc = ins / cycle if cycle > 0 else 0
-
-        meter.end()
 
         output = meter.result
         cpu_ener = output.pkg[0] / 1000000 # Assuming single-socket CPU; adjust as necessary
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     print("length of x:",  len(X))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    for i in range(10, 455):  # X.shape[1] gives the number of columns (features)
+    for i in range(100, 455):  # X.shape[1] gives the number of columns (features)
 
         X_train_data = X_train[0:i, :]
         y_train_data = y_train[0:i]
@@ -111,6 +111,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_decisiontrees_ipc_cycles_dataset_10_iterations_avg.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_decisiontrees_dataset.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'w')
 

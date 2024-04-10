@@ -12,18 +12,61 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 import dataset
 
+def clean_data(data, feature, target):
 
+    mean = data[target].mean()
+    std_dev = data[target].std()
+
+    # Set the threshold (e.g., 3 standard deviations)
+    threshold = 3
+
+    # Calculate Z-score for each data point
+    data['Z_score'] = (data[target] - mean) / std_dev
+
+    # Identify outliers based on the threshold
+    outliers = data[np.abs(data['Z_score']) > threshold]
+
+    # Remove rows with outliers
+    cleaned_data = data[np.abs(data['Z_score']) <= threshold]
+
+    # Optionally, remove the 'Z_score' column from the cleaned data
+    cleaned_data = cleaned_data.drop(columns=['Z_score'])
+
+    #cleaned_data[['ipc']] = cleaned_data[['ipc']].round(4)
+
+    #X = cleaned_data[[feature]]
+
+
+    # Dependent variable
+
+
+
+    #cleaned_data[["cpu energy"]] = cleaned_data[["cpu energy"]].round(4)
+
+    #y = cleaned_data[[target]]
+
+    return cleaned_data
 
 # Creating a DataFrame from the CSV data
-data = pd.read_csv("../dataset/ipc_cycles_dataset/ML_model_svm_ipc_cycles_dataset_10_iterations_avg.csv")
+data = pd.read_csv("../dataset/ipc_cycles_dataset/test.csv")
+print(data)
+clean_data_stage1 = clean_data(data,'ipc','cpu energy')
+print(clean_data_stage1)
+clean_data_stage2 = clean_data(clean_data_stage1,'cycles','dram energy')
+print(clean_data_stage2)
 
 
-#For CPU Model
+X = data[['cycles']]
+Y = data[['cpu energy']]
+print(X)
+print(Y)
+
+"""#For CPU Model
 # Independent variables
 X = data['ipc']
 
 # Dependent variables
-Y = data['cpu energy']
+Y = data['cpu energy']"""
 
 
 """#For DRAM Model
@@ -74,9 +117,9 @@ plt.figure(figsize=(10, 10))
 plt.scatter(X, Y, label='graph')
 
 # Adding title and labels
-plt.title('cycles vs cpu energy')
-plt.xlabel('X')
-plt.ylabel('Y')
+plt.title('perf counters vs energy')
+plt.xlabel('ipc')
+plt.ylabel('dram energy')
 
 # Adding a grid for better readability
 plt.grid(True)

@@ -26,11 +26,10 @@ def measure_model_perf_energy(X_train, y_train):
         regr = LinearRegression()
         regr.fit(X_train, y_train)
         counters = papi_high.stop_counters()
+        meter.end()
         ins = counters[0]
         cycle = counters[1]
         ipc = ins / cycle if cycle > 0 else 0
-
-        meter.end()
 
         output = meter.result
         cpu_ener = output.pkg[0] / 1000000 # Assuming single-socket CPU; adjust as necessary
@@ -69,11 +68,12 @@ if __name__ == "__main__":
     all_events = {}
 
     # Fetch the California housing dataset
-    california_housing = datasets.fetch_california_housing()
-    X, y = california_housing.data, california_housing.target
+    #california_housing = datasets.fetch_california_housing()
+    diabetes = datasets.load_diabetes()
+    X, y = diabetes.data, diabetes.target
     cnt = 0
     print("length of x:",  len(X))
-    for i in range(10000, 10005):  # X.shape[1] gives the number of columns (features)
+    for i in range(100, 443):  # X.shape[1] gives the number of columns (features)
                 # Select the current feature
                 X_train = X[:i, :]
                 y_train = y[:i]   # Selecting a single feature column; reshaping is not required here
@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../dataset/ipc_cycles_dataset/ML_model_ipc_cycles_dataset_10_iterations_avg.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_linear_dataset.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'w')
 

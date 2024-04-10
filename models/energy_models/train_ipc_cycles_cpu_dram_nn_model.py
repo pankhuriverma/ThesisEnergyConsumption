@@ -165,7 +165,7 @@ def train_val_test_split(X, y, test_size=0.2, val_size=0.25, random_state=None):
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-csv_file_path = '../../dataset/ipc_cycles_dataset/ML_model_linear_ipc_cycles_dataset_10_iterations_avg.csv'
+csv_file_path = '../../dataset/ipc_cycles_dataset/old_dataset/ML_model_linear_ipc_cycles_dataset_10_iterations_avg.csv'
 data = pd.read_csv(csv_file_path)
 print(data)
 clean_data_stage1 = clean_data(data,'ipc','cpu energy')

@@ -9,8 +9,8 @@ import scipy.stats as stats
 
 
 # Creating a DataFrame from the CSV data
-data = pd.read_csv('../dataset/cycles_dataset/ML_model_collected_dataset_cycles_10iterations_avg.csv')
-independent_vars = ['cycles']
+data = pd.read_csv('../dataset/ipc_cycles_dataset/test.csv')
+independent_vars = ['cycles','ins']
 """#Independent variables
 independent_vars = ["Total Instructions", "Total Cycles", "L1 Data Cache Misses",
                    "L1 Instruction Cache Misses", "L2 Data Cache Misses", "L2 Instruction Cache Misses",
@@ -40,7 +40,7 @@ independent_vars = ["Total Instructions", "Total Cycles", "L1 Data Cache Misses"
 """independent_vars = ["cycles"]"""
 
 # Dependent variables
-dependent_vars = ['dram energy']
+dependent_vars = ['dram energy','cpu energy']
 
 # Calculating Spearman correlation coefficient
 correlation_results = {}
