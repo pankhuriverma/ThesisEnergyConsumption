@@ -50,14 +50,14 @@ def clean_data(data, feature, target):
 # Creating a DataFrame from the CSV data
 data = pd.read_csv("../dataset/ipc_cycles_dataset/test.csv")
 print(data)
-clean_data_stage1 = clean_data(data,'ipc','cpu energy')
+clean_data_stage1 = clean_data(data,'ins','cpu energy')
 print(clean_data_stage1)
 clean_data_stage2 = clean_data(clean_data_stage1,'cycles','dram energy')
 print(clean_data_stage2)
 
 
 X = data[['cycles']]
-Y = data[['cpu energy']]
+Y = data[['dram energy']]
 print(X)
 print(Y)
 

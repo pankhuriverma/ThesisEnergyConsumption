@@ -1,13 +1,12 @@
 # Import necessary libraries
-from sklearn import datasets
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from pypapi import papi_high, events as papi_events
 import pyRAPL
 import pandas as pd
 import time
 from pypapi import papi_high, events as papi_events
+from sklearn.datasets import load_breast_cancer
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
 pyRAPL.setup()
 
 def measure_model_perf_energy(X_train, y_train):
@@ -23,10 +22,12 @@ def measure_model_perf_energy(X_train, y_train):
         meter.begin()
 
         papi_high.start_counters([papi_events.PAPI_TOT_INS, papi_events.PAPI_TOT_CYC])
-        regr = LinearRegression()
-        regr.fit(X_train, y_train)
+        # Initialize Gaussian Naive Bayes
+        gnb = GaussianNB()
+        gnb.fit(X_train, y_train)
         counters = papi_high.stop_counters()
         meter.end()
+
         ins = counters[0]
         cycle = counters[1]
         ipc = ins / cycle if cycle > 0 else 0
@@ -67,32 +68,36 @@ if __name__ == "__main__":
     counter = []
     all_events = {}
 
-    # Fetch the California housing dataset
-    california_housing = datasets.fetch_california_housing()
-    #diabetes = datasets.load_diabetes()
-    X, y = california_housing.data, california_housing.target
+    # Load the breast cancer dataset
+    data = load_breast_cancer()
+    X = data.data
+    y = data.target
+    print(X.shape)
+    print(y.shape)
+
     cnt = 0
     print("length of x:",  len(X))
-    for i in range(9000, 10000):  # X.shape[1] gives the number of columns (features)
-                # Select the current feature
-                X_train = X[:i, :]
-                y_train = y[:i]   # Selecting a single feature column; reshaping is not required here
 
-                # Split the data into training/testing sets
-                X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    for i in range(100, 455):  # X.shape[1] gives the number of columns (features)
 
-                ins, cyc, ipc, cpu_ene, dram_ene, total_ene = measure_model_perf_energy(X_train, y_train)
-                ins_data.append(ins)
-                ipc_data.append(ipc)
-                cyc_data.append(cyc)
+        X_train_data = X_train[0:i, :]
+        y_train_data = y_train[0:i]
+        print(X_train_data.shape)
+        print(y_train.shape)
 
-                cpu_energy.append(cpu_ene)
-                dram_energy.append(dram_ene)
-                total_energy.append(total_ene)
+        ins, cyc, ipc, cpu_ene, dram_ene, total_ene = measure_model_perf_energy(X_train_data, y_train_data)
+        ins_data.append(ins)
+        ipc_data.append(ipc)
+        cyc_data.append(cyc)
 
-                cnt += 1
-                counter.append(cnt)
-                print(cnt)
+        cpu_energy.append(cpu_ene)
+        dram_energy.append(dram_ene)
+        total_energy.append(total_ene)
+
+        cnt += 1
+        counter.append(cnt)
+        print(cnt)
 
     all_events["index"] = counter
     all_events["ins"] = ins_data
@@ -106,6 +111,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_linear_california_dataset.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_naivebayes_dataset.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'w')
 
