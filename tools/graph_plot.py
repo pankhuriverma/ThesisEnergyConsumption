@@ -56,8 +56,8 @@ clean_data_stage2 = clean_data(clean_data_stage1,'cycles','dram energy')
 print(clean_data_stage2)
 
 
-X = data[['cycles']]
-Y = data[['dram energy']]
+X = clean_data_stage2[['cycles']]
+Y = clean_data_stage2[['cpu energy']]
 print(X)
 print(Y)
 

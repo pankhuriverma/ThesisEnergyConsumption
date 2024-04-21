@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import random as python_random
+import pyRAPL
+pyRAPL.setup()
 
 # Ensure TensorFlow does not use GPU
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -21,56 +23,41 @@ def reset_random_seeds():
    tf.random.set_seed(42)
 
 reset_random_seeds()
-def plot_graph(batch_size, ipc, cycles):
-
-
-    # Create a figure and a set of subplots
-    fig, ax1 = plt.subplots()
-
-    # Plot the first set of data and set axis labels
-    color = 'tab:red'
-    ax1.set_xlabel("layers")
-    ax1.set_ylabel("ipc", color=color)
-    ax1.scatter(batch_size, ipc, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    # Instantiate a second y-axis sharing the same x-axis
-    ax2 = ax1.twinx()
-
-    # Plot the second set of data with a different color
-    color = 'tab:blue'
-    ax2.set_ylabel("cycles", color=color)
-    ax2.scatter(batch_size, cycles, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-
-    # Title and grid
-    plt.title('Graph of Peformance Counters vs  Energy (Huber Loss)')
-    ax1.grid(True)
-
-    # Show the plot
-    plt.show()
-
-def plot_3_graphs(batch_size, ipc_data, total_cycles, accuracies):
+def plot_3_graphs(batch_size, ipc_data, total_cycles, cpu_energy, dram_energy, accuracies):
     # Create 1x3 subplots
-    fig, axs = plt.subplots(1, 3, figsize=(10, 5))
+    fig, axs = plt.subplots(2, 3, figsize=(10, 5))
 
     # Plot IPC
-    axs[0].plot(batch_size, ipc_data, marker='o', color='red')
-    axs[0].set_title('IPC vs Batch Size')
-    axs[0].set_xlabel('Batch Size')
-    axs[0].set_ylabel('IPC')
+    axs[0,0].plot(batch_size, ipc_data, marker='o', color='red')
+    axs[0,0].set_title('Instructions vs Batch Size')
+    axs[0,0].set_xlabel('Batch Size')
+    axs[0,0].set_ylabel('Instructions')
 
     # Plot Cycles
-    axs[1].plot(batch_size, total_cycles, marker='o', color='blue')
-    axs[1].set_title('Cycles vs Batch Size')
-    axs[1].set_xlabel('Batch Size')
-    axs[1].set_ylabel('Cycles')
+    axs[0,1].plot(batch_size, total_cycles, marker='o', color='blue')
+    axs[0,1].set_title('Cycles vs Batch Size')
+    axs[0,1].set_xlabel('Batch Size')
+    axs[0,1].set_ylabel('Cycles')
 
     # Plot Accuracy
-    axs[2].plot(batch_size, accuracies, marker='o', color='green')
-    axs[2].set_title('Accuracy vs Batch Size')
-    axs[2].set_xlabel('Batch Size')
-    axs[2].set_ylabel('Accuracy')
+    axs[0,2].plot(batch_size, accuracies, marker='o', color='green')
+    axs[0,2].set_title('Accuracy vs Batch Size')
+    axs[0,2].set_xlabel('Batch Size')
+    axs[0,2].set_ylabel('Accuracy')
+
+    # Plot CPU Energy
+    axs[1, 0].plot(batch_size, cpu_energy, marker='o', color='red')
+    axs[1, 0].set_title('CPU Energy vs Batch Size')
+    axs[1, 0].set_xlabel('Batch Size')
+    axs[1, 0].set_ylabel('CPU Energy')
+
+    # Plot DRAM Energy
+    axs[1, 1].plot(batch_size, dram_energy, marker='o', color='blue')
+    axs[1, 1].set_title('DRAM Energy vs Batch Size')
+    axs[1, 1].set_xlabel('Batch Size')
+    axs[1, 1].set_ylabel('DRAM Energy')
+
+    axs[1, 2].axis('off')
 
     # Adjust layout to prevent overlap
     plt.tight_layout()
@@ -103,28 +90,38 @@ X_test_scaled = scaler.transform(X_test)
 
 # Initialize a list to store the accuracy of each model
 accuracies = []
-ipc_data = []
+total_instructions = []
 total_cycles = []
+cpu_energy = []
+dram_energy = []
 batch_size = []
 data = {}
 
 
 # Loop over batch sizes from 1 to 30
-for batch in range(50, 200):
+for batch in range(20,51):
     # Create a new instance of the model for each batch size
     model = create_model()
     batch_size.append(batch)
+    meter = pyRAPL.Measurement('LR Model')
+    meter.begin()
     papi_high.start_counters([papi_events.PAPI_TOT_INS, papi_events.PAPI_TOT_CYC])
 
     # Train the model
     model.fit(X_train_scaled, y_train, batch_size=batch, epochs=50, verbose=0)
     counters = papi_high.stop_counters()
-
+    meter.end()
     ins = counters[0]
     cycle = counters[1]
-    ipc = ins / cycle if cycle > 0 else 0
-    ipc_data.append(ipc)
+    total_instructions.append(ins)
     total_cycles.append(cycle)
+    output = meter.result
+    cpu_ener = output.pkg[0] / 1000000  # Assuming single-socket CPU; adjust as necessary
+    dram_ener = output.dram[0] / 1000000
+
+
+    cpu_energy.append(cpu_ener)
+    dram_energy.append(dram_ener)
     # Evaluate the model on the test set
     loss, accuracy = model.evaluate(X_test_scaled, y_test, verbose=0)
 
@@ -132,11 +129,13 @@ for batch in range(50, 200):
     accuracies.append(accuracy)
 
 data["batch_size"] = batch_size
-data["ipc"] = ipc_data
+data["ipc"] = total_instructions
 data["cycles"] = total_cycles
+data["cpu energy"] = cpu_energy
+data["dram energy"] = dram_energy
 
 print(batch_size)
-print(ipc_data)
+print(total_instructions)
 print(total_cycles)
 
 df = pd.DataFrame(data)
@@ -144,6 +143,6 @@ df = pd.DataFrame(data)
 csv_file = "/home/pankhuri/PycharmProjects/ThesisProject/dataset/hyperparameter_dataset/NN_model_batchsize.csv"
 df.to_csv(csv_file, index=False, mode = 'w')
 
-plot_3_graphs(batch_size, ipc_data, total_cycles, accuracies)
+plot_3_graphs(batch_size, total_instructions, total_cycles, cpu_energy, dram_energy, accuracies)
 
 

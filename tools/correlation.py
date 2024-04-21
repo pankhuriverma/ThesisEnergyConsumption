@@ -10,9 +10,8 @@ import scipy.stats as stats
 
 # Creating a DataFrame from the CSV data
 data = pd.read_csv('../dataset/ipc_cycles_dataset/test.csv')
-independent_vars = ['cycles','ins']
-"""#Independent variables
-independent_vars = ["Total Instructions", "Total Cycles", "L1 Data Cache Misses",
+independent_vars = ['ins']
+"""independent_vars = ["Total Instructions", "Total Cycles", "L1 Data Cache Misses",
                    "L1 Instruction Cache Misses", "L2 Data Cache Misses", "L2 Instruction Cache Misses",
                    "L1 Cache Misses", "L2 Cache Misses", "L2 Cache Misses",
                    "L3 Load Misses", "Data TLB Misses", "Ins TLB Misses",
@@ -35,12 +34,12 @@ independent_vars = ["Total Instructions", "Total Cycles", "L1 Data Cache Misses"
                    "L2 tot cache access", "L3 tot cache access", "L2 tot cache reads",
                    "L3 tot cache reads", "L2 tot cache writes", "L3 tot cache writes",
                    "FLOPS:sing_prec_vec_ops", "FLOPS:dob_prec_vec_ops",
-                   "Sing precision vec ins", "Dob prec vec ins", "Ref clock cyc"]"""
+                   "Sing precision vec ins", "Dob prec vec ins", "Ref clock cyc"]
 
-"""independent_vars = ["cycles"]"""
-
+"""
+independent_vars = ['ins', 'cycles']
 # Dependent variables
-dependent_vars = ['dram energy','cpu energy']
+dependent_vars = ['dram energy', 'cpu energy']
 
 # Calculating Spearman correlation coefficient
 correlation_results = {}
@@ -55,8 +54,8 @@ sorted_data_dict = dict(sorted(correlation_results.items(), key=lambda item: ite
 print(sorted_data_dict)
 
 
-"""with open('../results/correlation_results/correlation_ML_model_all_events_dram.txt', 'w') as f:
-    print(sorted_data_dict, file=f)
+"""with open('../results/correlation_results/correlation_ML_model_linear_all_events.txt', 'w') as f:
+    print(sorted_data_dict, file=f)"""
 
-"""
+
 

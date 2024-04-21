@@ -22,13 +22,13 @@ def measure_model_perf_energy(X_train, y_train):
         meter = pyRAPL.Measurement('LR Model')
         meter.begin()
 
-        papi_high.start_counters([papi_events.PAPI_TOT_INS, papi_events.PAPI_TOT_CYC])
+        papi_high.start_counters([papi_events.PAPI_DP_OPS])
         regr = LinearRegression()
         regr.fit(X_train, y_train)
         counters = papi_high.stop_counters()
         meter.end()
         ins = counters[0]
-        cycle = counters[1]
+        cycle = counters[0]
         ipc = ins / cycle if cycle > 0 else 0
 
         output = meter.result
@@ -73,6 +73,7 @@ if __name__ == "__main__":
     X, y = california_housing.data, california_housing.target
     cnt = 0
     print("length of x:",  len(X))
+
     for i in range(9000, 10000):  # X.shape[1] gives the number of columns (features)
                 # Select the current feature
                 X_train = X[:i, :]
@@ -106,6 +107,6 @@ if __name__ == "__main__":
 
 
     df = pd.DataFrame(all_events)
-    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_linear_california_dataset.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/ipc_cycles_dataset/ML_model_linear_fpops_california_dataset.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode = 'w')
 

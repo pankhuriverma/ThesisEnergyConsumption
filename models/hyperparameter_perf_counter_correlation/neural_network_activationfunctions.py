@@ -12,6 +12,8 @@ from pypapi import papi_high, events as papi_events
 import numpy as np
 import tensorflow as tf
 import random as python_random
+import pyRAPL
+pyRAPL.setup()
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 def reset_random_seeds():
    np.random.seed(42)
@@ -19,57 +21,43 @@ def reset_random_seeds():
    tf.random.set_seed(42)
 
 reset_random_seeds()
-def plot_graph(lr, ipc, cycles):
 
 
-    # Create a figure and a set of subplots
-    fig, ax1 = plt.subplots()
-
-    # Plot the first set of data and set axis labels
-    color = 'tab:red'
-    ax1.set_xlabel("activation functions")
-    ax1.set_ylabel("ipc", color=color)
-    ax1.plot(lr, ipc, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    # Instantiate a second y-axis sharing the same x-axis
-    ax2 = ax1.twinx()
-
-    # Plot the second set of data with a different color
-    color = 'tab:blue'
-    ax2.set_ylabel("accuracy", color=color)
-    ax2.plot(lr, cycles, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-
-    # Title and grid
-    plt.title('Graph of ipc vs  accuracy for different activation functions')
-    ax1.grid(True)
-
-    # Show the plot
-    plt.show()
-
-def plot_3_graphs(activation_functions, ipc_data, total_cycles, accuracies):
+def plot_3_graphs(activation_functions, ipc_data, total_cycles, cpu_energy, dram_energy, total_energy, accuracies):
     # Create 1x3 subplots
-    fig, axs = plt.subplots(1, 3, figsize=(10, 5))
+    fig, axs = plt.subplots(2, 3, figsize=(10, 5))
 
     # Plot IPC
-    axs[0].plot(activation_functions, ipc_data, marker='o', color='red')
-    axs[0].set_title('IPC vs Activation Functions')
-    axs[0].set_xlabel('Activation Functions')
-    axs[0].set_ylabel('IPC')
+    axs[0,0].plot(activation_functions, ipc_data, marker='o', color='red')
+    axs[0,0].set_title('Instructions vs Activation Functions')
+    axs[0,0].set_xlabel('Activation Functions')
+    axs[0,0].set_ylabel('Instructions')
 
     # Plot Cycles
-    axs[1].plot(activation_functions, total_cycles, marker='o', color='blue')
-    axs[1].set_title('Cycles vs Activation Functions')
-    axs[1].set_xlabel('Activation Functions')
-    axs[1].set_ylabel('Cycles')
+    axs[0,1].plot(activation_functions, total_cycles, marker='o', color='blue')
+    axs[0,1].set_title('Cycles vs Activation Functions')
+    axs[0,1].set_xlabel('Activation Functions')
+    axs[0,1].set_ylabel('Cycles')
 
     # Plot Accuracy
-    axs[2].plot(activation_functions, accuracies, marker='o', color='green')
-    axs[2].set_title('Accuracy vs Activation Functions')
-    axs[2].set_xlabel('Activation Functions')
-    axs[2].set_ylabel('Accuracy')
+    axs[0,2].plot(activation_functions, accuracies, marker='o', color='green')
+    axs[0,2].set_title('Accuracy vs Activation Functions')
+    axs[0,2].set_xlabel('Activation Functions')
+    axs[0,2].set_ylabel('Accuracy')
 
+    # Plot CPU Energy
+    axs[1,0].plot(activation_functions, cpu_energy, marker='o', color='red')
+    axs[1,0].set_title('CPU Energy vs Activation Functions')
+    axs[1,0].set_xlabel('Activation Functions')
+    axs[1,0].set_ylabel('CPU Energy')
+
+    # Plot DRAM Energy
+    axs[1,1].plot(activation_functions, dram_energy, marker='o', color='blue')
+    axs[1,1].set_title('DRAM Energy vs Activation Functions')
+    axs[1,1].set_xlabel('Activation Functions')
+    axs[1,1].set_ylabel('DRAM Energy')
+
+    axs[1, 2].axis('off')
     # Adjust layout to prevent overlap
     plt.tight_layout()
 
@@ -102,29 +90,42 @@ def create_model(activation):
     return model
 
 # List of activation functions to try
-activation_functions = [ 'tanh', 'relu', 'sigmoid', 'softmax']
+activation_functions = [ 'tanh',  'softmax',  'sigmoid', 'relu']
 #activation_functions = ['leaky_relu', 'relu', 'tanh', 'sigmoid', 'softmax', 'softplus']
 
 # Initialize a list to store the accuracy of each model
 accuracies = []
-ipc_data = []
+total_instructions = []
 total_cycles = []
+cpu_energy = []
+dram_energy = []
+total_energy = []
 data = {}
 
 # Loop over learning rates
 for activation in activation_functions:
     model = create_model(activation=activation)
+    meter = pyRAPL.Measurement('LR Model')
+    meter.begin()
     papi_high.start_counters([papi_events.PAPI_TOT_INS, papi_events.PAPI_TOT_CYC])
     # Train the model
     model.fit(X_train_scaled, y_train, epochs=100, batch_size=30, verbose=0)
 
     counters = papi_high.stop_counters()
-
+    meter.end()
     ins = counters[0]
     cycle = counters[1]
-    ipc = ins / cycle if cycle > 0 else 0
-    ipc_data.append(ipc)
+    total_instructions.append(ins)
     total_cycles.append(cycle)
+
+    output = meter.result
+    cpu_ener = output.pkg[0] / 1000000  # Assuming single-socket CPU; adjust as necessary
+    dram_ener = output.dram[0] / 1000000
+    total_ener = cpu_ener + dram_ener
+
+    cpu_energy.append(cpu_ener)
+    dram_energy.append(dram_ener)
+    total_energy.append(total_ener)
     # Evaluate the model on the test set
     loss, accuracy = model.evaluate(X_test_scaled, y_test, verbose=0)
     accuracies.append(accuracy)
@@ -132,12 +133,14 @@ for activation in activation_functions:
 
 
 data["activation function"] = activation_functions
-data["ipc"] = ipc_data
+data["ins"] = total_instructions
 data["cycles"] = total_cycles
+data["cpu energy"] = cpu_energy
+data["dram energy"] = dram_energy
 data["accuracies"] = accuracies
 
 print(activation_functions)
-print(ipc_data)
+print(total_instructions)
 print(total_cycles)
 
 df = pd.DataFrame(data)
@@ -145,4 +148,4 @@ df = pd.DataFrame(data)
 csv_file = "/home/pankhuri/PycharmProjects/ThesisProject/dataset/hyperparameter_dataset/NN_model_activation_functions.csv"
 df.to_csv(csv_file, index=False, mode = 'w')
 
-plot_3_graphs(activation_functions, ipc_data, total_cycles, accuracies)
+plot_3_graphs(activation_functions, total_instructions, total_cycles, cpu_energy, dram_energy, total_energy, accuracies)
