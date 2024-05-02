@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 def calculate_co2(y_pred_list,y_test_list):
-    germany_co2_intensity = 365.477
+    germany_co2_intensity = 385.389
     pred_co2_list = []
     test_co2_list = []
     for pred,test in zip(y_pred_list, y_test_list):
@@ -32,13 +32,14 @@ def clean_data(data, feature, target):
     return cleaned_data
 
 
-def plot_2d_graph(X_test_unscaled, y_test_unscaled, y_pred_unscaled):
+def plot_2d_graph(X_train_unscaled,y_train_unscaled, y_train_pred_unscaled):
     plt.figure(figsize=(10, 6))
-    plt.scatter(X_test_unscaled, y_test_unscaled, color='blue', label='Actual')
-    plt.plot(X_test_unscaled, y_pred_unscaled, color='red', label='Predicted')
-    plt.xlabel('X')
-    plt.ylabel('y')
-    plt.title('Linear Regression')
+
+    plt.scatter(X_train_unscaled, y_train_unscaled, color='red')
+    plt.scatter(X_train_unscaled, y_train_pred_unscaled, color='blue')
+    plt.xlabel('CPU Energy (Test)')
+    plt.ylabel('CPU Energy (Predicted)')
+    plt.title('Linear Regression CPU Energy Model')
     plt.legend()
     plt.show()
 
@@ -68,7 +69,7 @@ def plot_graph(X, y1, y2, i, j,X_feature, y_target1, y_target2):
     ax2.tick_params(axis='y', labelcolor=color)
 
     # Title and grid
-    plt.title('Graph of Peformance Counters vs  Energy ')
+    plt.title('Graph of Peformance Counters vs  DRAM Energy ')
     ax1.grid(True)
 
     # Show the plot
@@ -94,7 +95,7 @@ clean_data_stage2 = clean_data(clean_data_stage1,'cycles','dram energy')
 #print(clean_data_stage2)
 
 X = data[['cycles','ins']]
-y = data[['cpu energy', 'dram energy']]
+y = data[['dram energy']]
 
 # Splitting the dataset into training and testing sets
 #X_train, X_test, y_train, y_test = train_test_split(X.values, y.values, test_size=0.2, random_state=42)
@@ -118,35 +119,30 @@ y_test_scaled = scaler.transform(y_test)
 np.random.seed(42)
 regr = LinearRegression()
 regr.fit(X_train_scaled, y_train_scaled)
-
+y_train_pred = regr.predict(X_train_scaled)
 y_pred = regr.predict(X_test_scaled)
 
 print('Coefficients: \n', regr.coef_)
 print('Intercept: \n', regr.intercept_)
-print(mean_absolute_error(y_test_scaled, y_pred))
-print(r2_score(y_test_scaled, y_pred))
+print('Mean absolute error: \n',mean_absolute_error(y_test_scaled, y_pred))
+print('R2 Score: \n',r2_score(y_test_scaled, y_pred))
+
+X_train_unscaled = scaler.inverse_transform(X_train_scaled)
 X_test_unscaled = scaler.inverse_transform(X_test_scaled)
 y_test_unscaled = scaler.inverse_transform(y_test_scaled)
+y_train_unscaled = scaler.inverse_transform(y_train_scaled)
 y_pred_unscaled = scaler.inverse_transform(y_pred)
+y_train_pred_unscaled = scaler.inverse_transform(y_train_pred)
 
-"""print("X_test_unscaled")
-print(X_test_unscaled)
-print(X_test_unscaled.shape)
-print("y test unscaled")
-print(y_test_unscaled)
-print(y_test_unscaled.shape)
-print("y pred unscaled")
-print(y_pred_unscaled)
-print(y_pred_unscaled.shape)"""
 
-plot_2d_graph(X_test_unscaled, y_test_unscaled, y_pred_unscaled)
+#plot_2d_graph(X_train_unscaled, y_train_unscaled, y_train_pred_unscaled)
 
-feature_list = ['ins', 'cycles']
-target_list_test = ['cpu energy (Test)', 'dram energy (Test)']
-target_list_pred = ['cpu energy (Predicted)', 'dram energy (Predicted)']
+feature_list = ['Instructions', 'Cycles']
+target_list_test = ['DRAM Energy (Test)']
+target_list_pred = ['DRAM Energy (Predicted)']
 
 for i in range(0, 2):
-    for j in range(0, 2):
+    for j in range(0, 1):
         plot_graph(X_test_unscaled, y_test_unscaled, y_pred_unscaled, i, j, feature_list[i], target_list_test[j], target_list_pred[j])
 
 
@@ -166,10 +162,10 @@ to_csvfile["true energy"] = y_test_list
 y_pred_co2emm, y_test_co2emm = calculate_co2(y_pred_list, y_test_list)
 to_csvfile["pred co2"] = y_pred_co2emm
 to_csvfile["true co2"] = y_test_co2emm
-"""print(y_pred_co2emm)
-print(y_test_co2emm)"""
+print(y_pred_co2emm)
+print(y_test_co2emm)
 
-"""df = pd.DataFrame(to_csvfile)
-csv_file = '../../dataset/ipc_cycles_dataset/NN_model_ins_cycles_huber_loss_compare.csv' # Specify your CSV file name
-df.to_csv(csv_file, index=False, mode = 'w')"""
+df = pd.DataFrame(to_csvfile)
+csv_file = '../../dataset/ipc_cycles_dataset/NN_model_dram_energy_ins_cycles_mean_absolute_error.csv' # Specify your CSV file name
+df.to_csv(csv_file, index=False, mode = 'w')
 

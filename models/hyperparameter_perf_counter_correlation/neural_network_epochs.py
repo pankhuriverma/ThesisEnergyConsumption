@@ -24,38 +24,38 @@ reset_random_seeds()
 
 
 
-def plot_3_graphs(lrate, ipc_data, total_cycles, cpu_energy, dram_energy, accuracies):
+def plot_3_graphs(epoch_list, total_instructions, total_cycles, cpu_energy, dram_energy, accuracies):
     # Create 1x3 subplots
     fig, axs = plt.subplots(2, 3, figsize=(10, 5))
 
     # Plot IPC
-    axs[0,0].plot(lrate, ipc_data, marker='o', color='red')
-    axs[0,0].set_title('Instructions vs Learning Rate')
-    axs[0,0].set_xlabel('Learning Rate')
+    axs[0,0].plot(epoch_list, total_instructions, marker='o', color='red')
+    axs[0,0].set_title('Instructions vs Epochs')
+    axs[0,0].set_xlabel('Epochs')
     axs[0,0].set_ylabel('Instructions')
 
     # Plot Cycles
-    axs[0,1].plot(lrate, total_cycles, marker='o', color='blue')
-    axs[0,1].set_title('Cycles vs Learning Rate')
-    axs[0,1].set_xlabel('Learning Rate')
+    axs[0,1].plot(epoch_list, total_cycles, marker='o', color='blue')
+    axs[0,1].set_title('Cycles vs Epochs')
+    axs[0,1].set_xlabel('Epochs')
     axs[0,1].set_ylabel('Cycles')
 
     # Plot Accuracy
-    axs[0,2].plot(lrate, accuracies, marker='o', color='green')
-    axs[0,2].set_title('Accuracy vs Learning Rate')
-    axs[0,2].set_xlabel('Learning Rate')
+    axs[0,2].plot(epoch_list, accuracies, marker='o', color='green')
+    axs[0,2].set_title('Accuracy vs Epochs')
+    axs[0,2].set_xlabel('Epochs')
     axs[0,2].set_ylabel('Accuracy')
 
     # Plot CPU Energy
-    axs[1, 0].plot(lrate, cpu_energy, marker='o', color='red')
-    axs[1, 0].set_title('CPU Energy vs Learning Rate')
-    axs[1, 0].set_xlabel('Learning Rate')
+    axs[1, 0].plot(epoch_list, cpu_energy, marker='o', color='red')
+    axs[1, 0].set_title('CPU Energy vs Epochs')
+    axs[1, 0].set_xlabel('Epochs')
     axs[1, 0].set_ylabel('CPU Energy')
 
     # Plot DRAM Energy
-    axs[1, 1].plot(lrate, dram_energy, marker='o', color='blue')
-    axs[1, 1].set_title('DRAM Energy vs Learning Rate')
-    axs[1, 1].set_xlabel('Learning Rate')
+    axs[1, 1].plot(epoch_list, dram_energy, marker='o', color='blue')
+    axs[1, 1].set_title('DRAM Energy vs Epochs')
+    axs[1, 1].set_xlabel('Epochs')
     axs[1, 1].set_ylabel('DRAM Energy')
 
     axs[1, 2].axis('off')
@@ -82,20 +82,18 @@ X_test_scaled = scaler.transform(X_test)
 
 
 # Define a function to create the model
-def create_model(learning_rate):
+def create_model():
     model = Sequential([
         Dense(16, activation='relu', input_shape=(X_train_scaled.shape[1],)),
         Dense(16, activation='relu'),
         Dense(1, activation='sigmoid')
     ])
-    optimizer = Adam(learning_rate=learning_rate)
+    optimizer = Adam(learning_rate=0.001)
     model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
     return model
 
 
-# List of learning rates to try
-learning_rates = [0.001, 0.01, 0.1]
 
 # Initialize a list to store the accuracy of each model
 accuracies = []
@@ -103,19 +101,19 @@ total_instructions = []
 total_cycles = []
 cpu_energy = []
 dram_energy = []
-lrate = []
+epoch_list = []
 data = {}
 
-# Loop over learning rates
-for lr in learning_rates:
-    model = create_model(learning_rate=lr)
-    lrate.append(lr)
+# Loop over Epochss
+for ep in range(50,29,-1):
+    model = create_model()
+    epoch_list.append(ep)
     meter = pyRAPL.Measurement('LR Model')
     meter.begin()
     papi_high.start_counters([papi_events.PAPI_TOT_INS, papi_events.PAPI_TOT_CYC])
 
     # Train the model
-    model.fit(X_train_scaled, y_train, epochs=100, batch_size=30, verbose=0)
+    model.fit(X_train_scaled, y_train, epochs=ep, batch_size=30, verbose=0)
 
     counters = papi_high.stop_counters()
     meter.end()
@@ -134,21 +132,21 @@ for lr in learning_rates:
     # Evaluate the model on the test set
     loss, accuracy = model.evaluate(X_test_scaled, y_test, verbose=0)
     accuracies.append(accuracy)
-    print(f"Learning Rate: {lr}, Test Accuracy: {accuracy:.4f}")
+    print(f"Epochs: {ep}, Test Accuracy: {accuracy:.4f}")
 
-data["learning rate"] = lrate
+data["Epochs"] = epoch_list
 data["ins"] = total_instructions
 data["cycles"] = total_cycles
 data["accuracy"] = accuracies
 data["cpu energy"] = cpu_energy
 data["dram energy"] = dram_energy
 
-print(lrate)
+print(epoch_list)
 print(total_instructions)
 print(total_cycles)
 
 df = pd.DataFrame(data)
-csv_file = "/home/pankhuri/PycharmProjects/ThesisProject/dataset/hyperparameter_dataset/NN_model_lr.csv"
+csv_file = "/home/pankhuri/PycharmProjects/ThesisProject/dataset/hyperparameter_dataset/NN_model_epochs.csv"
 df.to_csv(csv_file, index=False, mode = 'w')
 
-plot_3_graphs(lrate, total_instructions, total_cycles, cpu_energy, dram_energy, accuracies)
+plot_3_graphs(epoch_list, total_instructions, total_cycles, cpu_energy, dram_energy, accuracies)

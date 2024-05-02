@@ -1,21 +1,27 @@
-Cycles vs DRAM Energy
-MSE Test Loss: 0.0208157729357481
-Huber Test Loss: 0.010405920445919037
+CPU Energy
 
-IPC vs CPU Energy
-MSE Test Loss: 0.01587483286857605
-Huber Test Loss: 0.007927232421934605
+Coefficients:
+ [[0.84030965 0.16071597]]
+Intercept:
+ [0.00042871]
+Mean absolute error:
+ 0.0006029887711201893
+R2 Score:
+ 0.9998675091558266
 
-IPC, Cycles vs CPU, DRAM Energy
-Huber Train Loss: 0.0020
-Huber Test Loss: 0.0019324686145409942
+CPU Energy Error 0.15845592066945297
+CO2 Error 0.1584559206694531
+____________________________________________________________
 
-MSE Train Loss: 0.0040
-MSE Test Loss: 0.0038565669674426317
+DRAM Energy
 
+Coefficients:
+ [[0.84543874 0.18049153]]
+Intercept:
+ [0.00153388]
+Mean absolute error:
+ 0.0025506432439397174
+R2 Score:
+ 0.9925084287025225
 
-
-Final Results
-Huber Train Loss: 0.0020
-Huber Val Loss: 0.0023
-Huber Test Loss: 0.0021620886400341988
+CO2 Error 0.27344167746251985

@@ -10,9 +10,9 @@ def plot_2d_graph(X,Y):
     plt.scatter(X, Y, label='graph')
 
     # Adding title and labels
-    plt.title('X vs Y')
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    plt.title('DRAM CO2 Emission (Test vs Predicted)')
+    plt.xlabel('DRAM CO2 Emission (Test)')
+    plt.ylabel('DRAM CO2 Emission (Predicted)')
 
     # Adding a grid for better readability
     plt.grid(True)
@@ -25,22 +25,23 @@ def calculate_error_percentage(actual, predicted):
     error_percentage = ((actual - predicted) / actual) * 100
     return abs(error_percentage)  # Taking the absolute value to get a positive percentage
 
-data = pd.read_csv("../dataset/ipc_dataset/NN_model_ipc_cpu_pred_test_compare.csv")
-print(data['true'])
-print(data['pred'])
-plot_2d_graph(data['pred'],data['true'])
+data = pd.read_csv("../dataset/ipc_cycles_dataset/NN_model_dram_energy_ins_cycles_mean_absolute_error.csv")
+print(data['pred co2'])
+print(data['true co2'])
+plot_2d_graph(data['pred co2'],data['true co2'])
 """data['true'] = pd.to_numeric(data['true'], errors='coerce')
 data['pred'] = pd.to_numeric(data['pred'], errors='coerce')"""
 
-actual = data['true']
-predicted = data['pred']
-error = []
+actual_co2 = data['true co2']
+predicted_co2 = data['pred co2']
 
-for i, j in zip(actual, predicted):
-    error_percentage = calculate_error_percentage(i, j)/len(actual)
-    error.append(error_percentage)
+error_co2=[]
+for i, j in zip(actual_co2, predicted_co2):
+    error_percentage_co2 = calculate_error_percentage(i, j)/len(actual_co2)
+    error_co2.append(error_percentage_co2)
 
-print(error)
+print("CO2 Error",np.average(error_co2))
+
 """# Using pandas to ignore NaN
 pd_series = pd.Series(error)
 sum_without_nan_pd = pd_series.sum()
@@ -57,4 +58,4 @@ sum_clean_list = sum(clean_list)
 print("Sum of cleaned list:", sum_clean_list)"""
 
 
-print(np.average(error))
+
