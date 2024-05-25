@@ -1,4 +1,1 @@
-{'cycles and cpu energy': {'rho': 0.9229710785275361, 'p_value': 0.0},
-'cycles and dram energy': {'rho': 0.8697736902927281, 'p_value': 0.0},
-'ins and cpu energy': {'rho': 0.8615656543474847, 'p_value': 0.0},
-'ins and dram energy': {'rho': 0.7519459613779389, 'p_value': 0.0}}
+{'cycles and cpu energy': {'rho': 0.9229710785275361, 'p_value': 0.0}, 'cycles and dram energy': {'rho': 0.8697736902927281, 'p_value': 0.0}, 'ins and cpu energy': {'rho': 0.8615656543474847, 'p_value': 0.0}, 'ins and dram energy': {'rho': 0.7519459613779389, 'p_value': 0.0}}

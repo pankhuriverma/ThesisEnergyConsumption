@@ -133,6 +133,6 @@ if __name__ == "__main__":
     all_events["dram energy"] = dram_energy
 
     df = pd.DataFrame(all_events)
-    csv_file = '../../dataset/all_dataset_perf_counter/ML_model_linear_all_events.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/all_pmc_dataset/ML_model_linear_all_events.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode='a')
 

@@ -37,8 +37,8 @@ def plot_2d_graph(X_train_unscaled,y_train_unscaled, y_train_pred_unscaled):
 
     plt.scatter(X_train_unscaled, y_train_unscaled, color='red')
     plt.scatter(X_train_unscaled, y_train_pred_unscaled, color='blue')
-    plt.xlabel('CPU Energy (Test)')
-    plt.ylabel('CPU Energy (Predicted)')
+    plt.xlabel('CPU Energy (Test) (in Joules)')
+    plt.ylabel('CPU Energy (Predicted) (in Joules)')
     plt.title('Linear Regression CPU Energy Model')
     plt.legend()
     plt.show()
@@ -69,7 +69,7 @@ def plot_graph(X, y1, y2, i, j,X_feature, y_target1, y_target2):
     ax2.tick_params(axis='y', labelcolor=color)
 
     # Title and grid
-    plt.title('Graph of Peformance Counters vs  DRAM Energy ')
+    plt.title('Graph of Performance Monitoring Counters vs CPU Energy ')
     ax1.grid(True)
 
     # Show the plot
@@ -86,7 +86,7 @@ def train_val_test_split(X, y, test_size=0.2, val_size=0.25, random_state=None):
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-csv_file_path = '../../dataset/ipc_cycles_dataset/test.csv'
+csv_file_path = '../../dataset/ipc_cycles_dataset/ins_cycles_all_ml_models_dataset.csv'
 data = pd.read_csv(csv_file_path)
 #print(data)
 clean_data_stage1 = clean_data(data,'ins','cpu energy')
@@ -94,7 +94,7 @@ clean_data_stage1 = clean_data(data,'ins','cpu energy')
 clean_data_stage2 = clean_data(clean_data_stage1,'cycles','dram energy')
 #print(clean_data_stage2)
 
-X = data[['cycles','ins']]
+X = data[['ins','cycles']]
 y = data[['dram energy']]
 
 # Splitting the dataset into training and testing sets
@@ -133,13 +133,13 @@ y_test_unscaled = scaler.inverse_transform(y_test_scaled)
 y_train_unscaled = scaler.inverse_transform(y_train_scaled)
 y_pred_unscaled = scaler.inverse_transform(y_pred)
 y_train_pred_unscaled = scaler.inverse_transform(y_train_pred)
-
+print(X_test_unscaled)
 
 #plot_2d_graph(X_train_unscaled, y_train_unscaled, y_train_pred_unscaled)
 
 feature_list = ['Instructions', 'Cycles']
-target_list_test = ['DRAM Energy (Test)']
-target_list_pred = ['DRAM Energy (Predicted)']
+target_list_test = ['CPU Energy (Test) (in Joules)']
+target_list_pred = ['CPU Energy (Predicted) (in Joules)']
 
 for i in range(0, 2):
     for j in range(0, 1):
@@ -156,16 +156,22 @@ for i in range(len(y_test_unscaled)):
 
 to_csvfile = {}
 
+
+
+
+
 to_csvfile["pred energy"] = y_pred_list
 to_csvfile["true energy"] = y_test_list
+
+
 
 y_pred_co2emm, y_test_co2emm = calculate_co2(y_pred_list, y_test_list)
 to_csvfile["pred co2"] = y_pred_co2emm
 to_csvfile["true co2"] = y_test_co2emm
-print(y_pred_co2emm)
+'''print(y_pred_co2emm)
 print(y_test_co2emm)
-
-df = pd.DataFrame(to_csvfile)
+'''
+'''df = pd.DataFrame(to_csvfile)
 csv_file = '../../dataset/ipc_cycles_dataset/NN_model_dram_energy_ins_cycles_mean_absolute_error.csv' # Specify your CSV file name
 df.to_csv(csv_file, index=False, mode = 'w')
-
+'''

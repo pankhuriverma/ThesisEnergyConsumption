@@ -48,16 +48,16 @@ def clean_data(data, feature, target):
     return cleaned_data
 
 # Creating a DataFrame from the CSV data
-data = pd.read_csv("../dataset/ipc_cycles_dataset/combined.csv")
+data = pd.read_csv("../dataset/ipc_cycles_dataset/test.csv")
 print(data)
-clean_data_stage1 = clean_data(data,'ins','cpu energy')
+'''clean_data_stage1 = clean_data(data,'ins','cpu energy')
 print(clean_data_stage1)
 clean_data_stage2 = clean_data(clean_data_stage1,'cycles','dram energy')
-print(clean_data_stage2)
+print(clean_data_stage2)'''
 
 
-X = clean_data_stage2[['ins']]
-Y = clean_data_stage2[['cpu energy']]
+X = data[['cycles']]
+Y = data[['cpu energy']]
 print(X)
 print(Y)
 
@@ -117,9 +117,9 @@ plt.figure(figsize=(10, 10))
 plt.scatter(X, Y, label='graph')
 
 # Adding title and labels
-plt.title('perf counters vs energy')
-plt.xlabel('ipc')
-plt.ylabel('dram energy')
+plt.title('CO2 emission true vs pred')
+plt.xlabel('cycles')
+plt.ylabel('CPU Energy (in Joules)')
 
 # Adding a grid for better readability
 plt.grid(True)

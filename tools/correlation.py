@@ -9,7 +9,7 @@ import scipy.stats as stats
 
 
 # Creating a DataFrame from the CSV data
-data = pd.read_csv('../dataset/ipc_cycles_dataset/test.csv')
+data = pd.read_csv('../dataset/ipc_cycles_dataset/ins_cycles_all_ml_models_dataset.csv')
 
 """independent_vars = ["L1 Data Cache Misses",
                    "L1 Instruction Cache Misses", "L2 Data Cache Misses", "L2 Instruction Cache Misses",

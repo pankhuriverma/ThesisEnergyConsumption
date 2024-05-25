@@ -25,7 +25,7 @@ def calculate_error_percentage(actual, predicted):
     error_percentage = ((actual - predicted) / actual) * 100
     return abs(error_percentage)  # Taking the absolute value to get a positive percentage
 
-data = pd.read_csv("../dataset/ipc_cycles_dataset/NN_model_dram_energy_ins_cycles_mean_absolute_error.csv")
+data = pd.read_csv("../dataset/energy_model_results_dataset/NN_model_dram_energy_ins_cycles_mean_absolute_error.csv")
 print(data['pred co2'])
 print(data['true co2'])
 plot_2d_graph(data['pred co2'],data['true co2'])

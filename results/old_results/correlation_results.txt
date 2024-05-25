@@ -1,9 +1,0 @@
-{'Total Instructions and cpu energy': {'rho': 0.7975826071535985, 'p_value': 2.556510934183467e-221},
-'Total Instructions and dram energy': {'rho': 0.9398588494980027, 'p_value': 0.0}, '
-Total Instructions and total energy': {'rho': 0.8425527385527386, 'p_value': 1.956391682256454e-270}, '
-Total Cycles and cpu energy': {'rho': 0.7945033920374328, 'p_value': 2.04003933047761e-218},
-'Total Cycles and dram energy': {'rho': 0.9400528956932132, 'p_value': 0.0},
-'Total Cycles and total energy': {'rho': 0.8397215157215159, 'p_value': 6.637111362232072e-267},
-'L1 Cache Misses and cpu energy': {'rho': 0.7952911628346568, 'p_value': 3.732145682038954e-219},
-'L1 Cache Misses and dram energy': {'rho': 0.9291807587558433, 'p_value': 0.0},
-'L1 Cache Misses and total energy': {'rho': 0.838939114939115, 'p_value': 6.102551566679849e-266}}

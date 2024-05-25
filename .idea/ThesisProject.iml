@@ -12,7 +12,6 @@
       <list>
         <option value="$MODULE_DIR$/tools" />
         <option value="$MODULE_DIR$/results" />
-        <option value="$MODULE_DIR$/other_files" />
         <option value="$MODULE_DIR$/models" />
         <option value="$MODULE_DIR$/dataset" />
       </list>

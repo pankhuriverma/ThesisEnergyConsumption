@@ -10,7 +10,7 @@ import time
 from pypapi import papi_high, events as papi_events
 from sklearn.naive_bayes import GaussianNB
 from sklearn.datasets import load_breast_cancer
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC  # Support Vector Classifier
 pyRAPL.setup()
 
 def measure_model_perf_energy(event_name, X_train, y_train):
@@ -24,8 +24,8 @@ def measure_model_perf_energy(event_name, X_train, y_train):
         meter.begin()
 
         papi_high.start_counters([event_name])
-        knn_classifier = KNeighborsClassifier(n_neighbors=5)
-        knn_classifier.fit(X_train, y_train)
+        svm_classifier = SVC(kernel='linear', random_state=42)
+        svm_classifier.fit(X_train, y_train)
         perf_counter_value = papi_high.stop_counters()
         meter.end()
         output = meter.result
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     counter = 0
     counter2 = 0
     for event, event_name in zip(events, event_names):
-        for i in range(100, 455):  # X.shape[1] gives the number of columns (features)
+        for i in range(100,455):  # X.shape[1] gives the number of columns (features)
                     X_data = X[:i, :]
                     y_data = y[:i]
 
@@ -138,6 +138,6 @@ if __name__ == "__main__":
     all_events["dram energy"] = dram_energy
 
     df = pd.DataFrame(all_events)
-    csv_file = '../../dataset/all_pmc_dataset/ML_model_knn_dataset.csv'  # Specify your CSV file name
+    csv_file = '../../dataset/all_pmc_dataset/ML_model_svm_dataset.csv'  # Specify your CSV file name
     df.to_csv(csv_file, index=False, mode='a')
 
